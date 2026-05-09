@@ -1,0 +1,32 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.ds.player'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.ds.player'
+        minSdk 21          // Android 5.0 — covers all modern Android TV boxes
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.debug  // debug key for now — easy to install
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    // No extra deps — pure Android WebView
+}

@@ -1,0 +1,53 @@
+services:
+  backend:
+    build: ./backend
+    env_file: .env
+    ports:
+      - '${PORT:-3001}:3001'
+    volumes:
+      - uploads:/app/uploads
+      - db:/app/data
+    environment:
+      - DB_PATH=/app/data/signage.db
+      - UPLOADS_DIR=/app/uploads
+      - LOG_DIR=/app/data/logs
+      - BACKUP_DIR=/app/data/backups
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000}
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3001/api/health']
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    networks:
+      - internal
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - '${FRONTEND_PORT:-3000}:80'
+    depends_on:
+      backend:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: '5m'
+        max-file: '2'
+    networks:
+      - internal
+    restart: unless-stopped
+
+volumes:
+  uploads:
+  db:
+
+networks:
+  internal:
+    driver: bridge
